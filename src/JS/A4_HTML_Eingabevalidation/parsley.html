@@ -2,12 +2,12 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-    <title>Alle HTML5 Input-Typen Formular</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alle HTML5 Input-Typen mit Parsley.js Validierung</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/parsleyjs@2.9.2/dist/parsley.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/parsleyjs@2.9.2/dist/i18n/de.js"></script>
     <style>
         .hidden { display: none; }
         .form-section {
@@ -20,6 +20,7 @@
             color: #495057;
             border-bottom: 1px solid #dee2e6;
             padding-bottom: 10px;
+            margin-bottom: 15px;
         }
         .required::after {
             content: " *";
@@ -29,12 +30,50 @@
             font-weight: bold;
             color: #0d6efd;
         }
+        .color-preview {
+            width: 100px;
+            height: 50px;
+            border: 2px solid #dee2e6;
+            border-radius: 5px;
+            margin-top: 10px;
+            display: inline-block;
+        }
+        .file-preview {
+            margin-top: 10px;
+            max-width: 200px;
+        }
+        .file-preview img {
+            max-width: 100%;
+            border-radius: 5px;
+            border: 2px solid #dee2e6;
+        }
+        .file-info {
+            margin-top: 5px;
+            font-size: 0.875rem;
+            color: #6c757d;
+        }
+        .parsley-errors-list {
+            margin-top: 0.25rem;
+            margin-bottom: 0;
+            padding-left: 0;
+            list-style: none;
+        }
+        .parsley-errors-list li {
+            color: #dc3545;
+            font-size: 0.875rem;
+        }
+        .parsley-error {
+            border-color: #dc3545;
+        }
+        .parsley-success {
+            border-color: #198754;
+        }
     </style>
 </head>
 <body class="p-4 bg-light">
 
 <div class="container">
-    <h1 class="text-center mb-4">HTML5 Input-Typen Demo</h1>
+    <h1 class="text-center mb-4">Alle HTML5 Input-Typen mit Parsley.js</h1>
 
     <div class="bs-callout bs-callout-warning hidden alert alert-danger">
         <h4>Ups!</h4>
@@ -55,7 +94,11 @@
             <div class="mb-3">
                 <label for="fullname" class="form-label required">Vollständiger Name</label>
                 <input type="text" id="fullname" class="form-control" name="fullname"
-                       required data-parsley-minlength="2" data-parsley-maxlength="50">
+                       required 
+                       data-parsley-minlength="2" 
+                       data-parsley-maxlength="50"
+                       data-parsley-minlength-message="Mindestens 2 Zeichen erforderlich"
+                       data-parsley-maxlength-message="Maximal 50 Zeichen erlaubt">
                 <div class="form-text">Mindestens 2 Zeichen, maximal 50 Zeichen</div>
             </div>
 
@@ -63,35 +106,45 @@
             <div class="mb-3">
                 <label for="password" class="form-label required">Passwort</label>
                 <input type="password" id="password" class="form-control" name="password"
-                       required data-parsley-minlength="6" data-parsley-pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$">
+                       required 
+                       data-parsley-minlength="6" 
+                       data-parsley-pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$"
+                       data-parsley-pattern-message="Mindestens 6 Zeichen, Groß- und Kleinbuchstaben sowie eine Zahl erforderlich">
                 <div class="form-text">Mindestens 6 Zeichen, Groß- und Kleinbuchstaben sowie eine Zahl</div>
             </div>
 
             <!-- email -->
             <div class="mb-3">
                 <label for="email" class="form-label required">E-Mail</label>
-                <input type="email" id="email" class="form-control" name="email" required>
+                <input type="email" id="email" class="form-control" name="email" 
+                       required
+                       data-parsley-type="email"
+                       data-parsley-type-message="Bitte geben Sie eine gültige E-Mail-Adresse ein">
             </div>
 
             <!-- url -->
             <div class="mb-3">
                 <label for="website" class="form-label">Webseite</label>
                 <input type="url" id="website" class="form-control" name="website"
-                       data-parsley-type="url">
+                       data-parsley-type="url"
+                       data-parsley-type-message="Bitte geben Sie eine gültige URL ein (z.B. https://example.com)">
             </div>
 
             <!-- tel -->
             <div class="mb-3">
                 <label for="phone" class="form-label">Telefon</label>
                 <input type="tel" id="phone" class="form-control" name="phone"
-                       data-parsley-pattern="^[\+]?[0-9\s\-\(\)]{6,}$">
+                       data-parsley-pattern="^[\+]?[0-9\s\-\(\)]{6,}$"
+                       data-parsley-pattern-message="Gültige Telefonnummer mit mindestens 6 Ziffern erforderlich">
                 <div class="form-text">Gültige Telefonnummer mit mindestens 6 Ziffern</div>
             </div>
 
             <!-- search -->
             <div class="mb-3">
                 <label for="search" class="form-label">Suche</label>
-                <input type="search" id="search" class="form-control" name="search">
+                <input type="search" id="search" class="form-control" name="search"
+                       data-parsley-maxlength="100"
+                       data-parsley-maxlength-message="Maximal 100 Zeichen erlaubt">
             </div>
         </div>
 
@@ -102,14 +155,21 @@
             <div class="mb-3">
                 <label for="quantity" class="form-label required">Menge (1-10)</label>
                 <input type="number" id="quantity" class="form-control" name="quantity"
-                       min="1" max="10" required>
+                       min="1" max="10" required
+                       data-parsley-type="number"
+                       data-parsley-min="1"
+                       data-parsley-max="10"
+                       data-parsley-min-message="Mindestens 1 erforderlich"
+                       data-parsley-max-message="Maximal 10 erlaubt">
             </div>
 
             <!-- range -->
             <div class="mb-3">
                 <label for="volume" class="form-label">Lautstärke (0-100): <span id="volume-value" class="volume-display">50</span></label>
                 <input type="range" id="volume" class="form-range" name="volume"
-                       min="0" max="100" value="50">
+                       min="0" max="100" value="50"
+                       data-parsley-range="[0, 100]"
+                       data-parsley-range-message="Wert muss zwischen 0 und 100 liegen">
             </div>
         </div>
 
@@ -120,7 +180,8 @@
             <div class="mb-3">
                 <label for="birthday" class="form-label">Geburtstag</label>
                 <input type="date" id="birthday" class="form-control" name="birthday"
-                       data-parsley-max="<?php echo date('Y-m-d'); ?>">
+                       data-parsley-max=""
+                       data-parsley-max-message="Das Datum darf nicht in der Zukunft liegen">
                 <div class="form-text">Darf nicht in der Zukunft liegen</div>
             </div>
 
@@ -128,7 +189,8 @@
             <div class="mb-3">
                 <label for="appointment" class="form-label">Termin</label>
                 <input type="datetime-local" id="appointment" class="form-control" name="appointment"
-                       data-parsley-min="<?php echo date('Y-m-d\TH:i'); ?>">
+                       data-parsley-min=""
+                       data-parsley-min-message="Das Datum muss in der Zukunft liegen">
                 <div class="form-text">Muss in der Zukunft liegen</div>
             </div>
 
@@ -151,7 +213,9 @@
             <!-- time -->
             <div class="mb-3">
                 <label for="alarm" class="form-label">Weckzeit</label>
-                <input type="time" id="alarm" class="form-control" name="alarm">
+                <input type="time" id="alarm" class="form-control" name="alarm"
+                       data-parsley-type="time"
+                       data-parsley-type-message="Bitte geben Sie eine gültige Zeit ein">
             </div>
         </div>
 
@@ -160,16 +224,21 @@
 
             <!-- color -->
             <div class="mb-3">
-                <label for="favcolor" class="form-label">Lieblingsfarbe</label>
+                <label for="favcolor" class="form-label">Lieblingsfarbe</label><br>
                 <input type="color" id="favcolor" class="form-control form-control-color" name="favcolor" value="#563d7c">
+                <div class="color-preview" id="color-preview" style="background-color: #563d7c;"></div>
+                <div class="form-text">Ausgewählte Farbe: <span id="color-value">#563d7c</span></div>
             </div>
 
             <!-- file -->
             <div class="mb-3">
                 <label for="fileUpload" class="form-label">Datei hochladen (nur Bilder)</label>
                 <input type="file" id="fileUpload" class="form-control" name="fileUpload"
-                       accept="image/*" data-parsley-filemaxmegabytes="2"
+                       accept="image/*" 
+                       data-parsley-filemaxmegabytes="2"
                        data-parsley-accept="image">
+                <div class="file-preview" id="file-preview"></div>
+                <div class="file-info" id="file-info"></div>
                 <div class="form-text">Maximal 2 MB, nur Bilddateien</div>
             </div>
 
@@ -211,8 +280,8 @@
             <!-- image -->
             <div class="mb-3">
                 <label class="form-label">Bild-Button</label><br>
-                <input type="image" src="https://placehold.co/600x400"
-                       alt="Absenden" width="80" height="40">
+                <input type="image" id="imageSubmit" src="https://placehold.co/600x400/563d7c/ffffff?text=Absenden" 
+                       alt="Absenden" width="120" height="40">
                 <div class="form-text">Funktioniert wie ein Submit-Button</div>
             </div>
 
@@ -223,7 +292,7 @@
             </div>
 
             <!-- hidden -->
-            <input type="hidden" id="token" name="token" value="secureToken123">
+            <input type="hidden" id="token" name="token" value="">
         </div>
 
         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
@@ -234,21 +303,138 @@
 
 <script>
     $(function () {
+        // Parsley.js deutsche Lokalisierung aktivieren
+        window.Parsley.setLocale('de');
+        
+        // Dynamische Datumswerte setzen
+        const today = new Date();
+        const todayStr = today.toISOString().split('T')[0]; // YYYY-MM-DD
+        const nowStr = today.toISOString().slice(0, 16); // YYYY-MM-DDTHH:mm
+        
+        $('#birthday').attr('data-parsley-max', todayStr);
+        $('#appointment').attr('data-parsley-min', nowStr);
+        
         // Parsley.js Konfiguration
-        $('#demo-form').parsley().on('field:validated', function() {
+        $('#demo-form').parsley({
+            trigger: 'change',
+            triggerAfterFailure: 'input',
+            errorClass: 'is-invalid',
+            successClass: 'is-valid',
+            errorsWrapper: '<ul class="parsley-errors-list"></ul>',
+            errorTemplate: '<li class="parsley-required"></li>'
+        }).on('field:validated', function() {
             const ok = $('.parsley-error').length === 0;
             $('.bs-callout-info').toggleClass('hidden', !ok);
             $('.bs-callout-warning').toggleClass('hidden', ok);
         }).on('form:submit', function() {
-            // Hier würde normalerweise die Formularverarbeitung stattfinden
             alert('Formular erfolgreich validiert! In einer echten Anwendung würde es jetzt abgeschickt werden.');
             return false; // Verhindert echte Absendung für diese Demo
         });
 
-        // Range-Slider Wert anzeigen
+        // ============================================
+        // JAVASCRIPT für Elemente die es benötigen:
+        // ============================================
+
+        // 1. RANGE: Slider-Wert anzeigen
         $('#volume').on('input', function() {
             $('#volume-value').text(this.value);
         });
+
+        // 2. COLOR: Farbvorschau und Wert anzeigen
+        $('#favcolor').on('input', function() {
+            const colorValue = this.value;
+            $('#color-preview').css('background-color', colorValue);
+            $('#color-value').text(colorValue);
+        });
+
+        // 3. FILE: Dateivorschau, Größenprüfung, Drag & Drop
+        $('#fileUpload').on('change', function(e) {
+            const file = e.target.files[0];
+            const preview = $('#file-preview');
+            const info = $('#file-info');
+            
+            preview.empty();
+            info.empty();
+            
+            if (file) {
+                // Größenprüfung (in MB)
+                const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+                info.html(`Dateiname: ${file.name}<br>Größe: ${fileSizeMB} MB<br>Typ: ${file.type}`);
+                
+                // Dateivorschau für Bilder
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        preview.html(`<img src="${e.target.result}" alt="Vorschau">`);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+        });
+
+        // Drag & Drop für File-Input
+        const fileInput = $('#fileUpload')[0];
+        const fileContainer = fileInput.closest('.mb-3');
+        
+        fileContainer.on('dragover', function(e) {
+            e.preventDefault();
+            $(this).addClass('border border-primary');
+        });
+        
+        fileContainer.on('dragleave', function(e) {
+            e.preventDefault();
+            $(this).removeClass('border border-primary');
+        });
+        
+        fileContainer.on('drop', function(e) {
+            e.preventDefault();
+            $(this).removeClass('border border-primary');
+            const files = e.originalEvent.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                $('#fileUpload').trigger('change');
+            }
+        });
+
+        // 4. BUTTON: Interaktive Funktionen
+        $('#myButton').on('click', function() {
+            const currentTime = new Date().toLocaleTimeString('de-DE');
+            alert(`Button wurde um ${currentTime} geklickt!\n\nDiese Funktion könnte beliebigen JavaScript-Code ausführen.`);
+        });
+
+        // 5. IMAGE: Bildwechsel und interaktive Funktionen
+        let imageIndex = 0;
+        const images = [
+            'https://placehold.co/600x400/563d7c/ffffff?text=Absenden',
+            'https://placehold.co/600x400/198754/ffffff?text=Submit',
+            'https://placehold.co/600x400/dc3545/ffffff?text=Send'
+        ];
+        
+        $('#imageSubmit').on('click', function(e) {
+            e.preventDefault();
+            imageIndex = (imageIndex + 1) % images.length;
+            $(this).attr('src', images[imageIndex]);
+            alert('Bild wurde geändert! Bild ' + (imageIndex + 1) + ' von ' + images.length);
+        });
+
+        // 6. HIDDEN: Dynamisches Setzen von Werten
+        function updateHiddenToken() {
+            const timestamp = new Date().toISOString();
+            const randomToken = Math.random().toString(36).substring(2, 15);
+            $('#token').val('token_' + timestamp + '_' + randomToken);
+        }
+        
+        // Token beim Laden setzen
+        updateHiddenToken();
+        
+        // Token bei jedem Feld-Change aktualisieren
+        $('#demo-form').on('change', 'input, select, textarea', function() {
+            updateHiddenToken();
+        });
+
+        // ============================================
+        // Custom Parsley Validatoren
+        // ============================================
 
         // Custom Validator für Dateiupload-Größe
         window.Parsley.addValidator('filemaxmegabytes', {
@@ -291,12 +477,23 @@
             }
         });
 
-        // Button mit Beispiel-Funktionalität
-        $('#myButton').on('click', function() {
-            alert('Button wurde geklickt! Diese Funktion könnte beliebigen JavaScript-Code ausführen.');
+        // Custom Validator für Range-Wert
+        window.Parsley.addValidator('range', {
+            validateString: function(value, requirement, parsleyInstance) {
+                const range = requirement.replace(/[\[\]]/g, '').split(',');
+                const min = parseFloat(range[0]);
+                const max = parseFloat(range[1]);
+                const numValue = parseFloat(value);
+                return numValue >= min && numValue <= max;
+            },
+            requirementType: 'string',
+            messages: {
+                de: 'Der Wert muss zwischen %s liegen.'
+            }
         });
     });
 </script>
 
 </body>
 </html>
+
