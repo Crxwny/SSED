@@ -75,16 +75,6 @@
 <div class="container">
     <h1 class="text-center mb-4">Alle HTML5 Input-Typen mit Parsley.js</h1>
 
-    <div class="bs-callout bs-callout-warning hidden alert alert-danger">
-        <h4>Ups!</h4>
-        <p>Das Formular enthält Fehler. Bitte überprüfen Sie Ihre Eingaben.</p>
-    </div>
-
-    <div class="bs-callout bs-callout-info hidden alert alert-success">
-        <h4>Erfolg!</h4>
-        <p>Alle Eingaben sind korrekt :)</p>
-    </div>
-
     <form id="demo-form" data-parsley-validate class="bg-white p-4 rounded shadow-sm">
 
         <div class="form-section">
@@ -97,8 +87,10 @@
                        required 
                        data-parsley-minlength="2" 
                        data-parsley-maxlength="50"
+                       data-parsley-pattern="^[a-zA-ZäöüÄÖÜß\s]+$"
                        data-parsley-minlength-message="Mindestens 2 Zeichen erforderlich"
-                       data-parsley-maxlength-message="Maximal 50 Zeichen erlaubt">
+                       data-parsley-maxlength-message="Maximal 50 Zeichen erlaubt"
+                       data-parsley-pattern-message="Nur Buchstaben und Leerzeichen erlaubt">
                 <div class="form-text">Mindestens 2 Zeichen, maximal 50 Zeichen</div>
             </div>
 
@@ -232,14 +224,14 @@
 
             <!-- file -->
             <div class="mb-3">
-                <label for="fileUpload" class="form-label">Datei hochladen (nur Bilder)</label>
+                <label for="fileUpload" class="form-label">Datei hochladen</label>
                 <input type="file" id="fileUpload" class="form-control" name="fileUpload"
-                       accept="image/*" 
+                       accept="image/png,image/jpeg,.png,.jpg,.jpeg" 
                        data-parsley-filemaxmegabytes="2"
-                       data-parsley-accept="image">
+                       data-parsley-accept="png,jpg">
                 <div class="file-preview" id="file-preview"></div>
                 <div class="file-info" id="file-info"></div>
-                <div class="form-text">Maximal 2 MB, nur Bilddateien</div>
+                <div class="form-text">Erlaubte Dateitypen: PNG, JPG. Maximal 2 MB.</div>
             </div>
 
             <!-- radio -->
@@ -322,13 +314,19 @@
             successClass: 'is-valid',
             errorsWrapper: '<ul class="parsley-errors-list"></ul>',
             errorTemplate: '<li class="parsley-required"></li>'
-        }).on('field:validated', function() {
-            const ok = $('.parsley-error').length === 0;
-            $('.bs-callout-info').toggleClass('hidden', !ok);
-            $('.bs-callout-warning').toggleClass('hidden', ok);
-        }).on('form:submit', function() {
-            alert('Formular erfolgreich validiert! In einer echten Anwendung würde es jetzt abgeschickt werden.');
-            return false; // Verhindert echte Absendung für diese Demo
+        });
+
+        $('#demo-form').on('submit', function(e) {
+            e.preventDefault();
+        });
+
+        $('input[type="submit"]').on('click', function(e) {
+            e.preventDefault();
+            if ($('#demo-form').parsley().isValid()) {
+                alert('Formular erfolgreich validiert! In einer echten Anwendung würde es jetzt abgeschickt werden.');
+            } else {
+                alert('Bitte korrigieren Sie die Fehler im Formular.');
+            }
         });
 
         // ============================================
@@ -370,6 +368,21 @@
                     reader.readAsDataURL(file);
                 }
             }
+        });
+
+        // RESET: Farbe und Bild zurücksetzen
+        $('#demo-form').on('reset', function() {
+            setTimeout(function() {
+                // Farbe zurücksetzen
+                $('#favcolor').val('#563d7c');
+                $('#color-preview').css('background-color', '#563d7c');
+                $('#color-value').text('#563d7c');
+                
+                // Datei zurücksetzen
+                $('#fileUpload').val('');
+                $('#file-preview').empty();
+                $('#file-info').empty();
+            }, 0);
         });
 
         // Drag & Drop für File-Input
@@ -466,14 +479,14 @@
                 }
 
                 var file = files[0];
-                if (acceptType === 'image') {
-                    return file.type.startsWith('image/');
+                if (acceptType === 'png,jpg') {
+                    return file.type === 'image/png' || file.type === 'image/jpeg';
                 }
 
                 return true;
             },
             messages: {
-                de: 'Bitte wählen Sie eine Bilddatei aus.'
+                de: 'Bitte wählen Sie eine PNG- oder JPG-Datei aus.'
             }
         });
 
