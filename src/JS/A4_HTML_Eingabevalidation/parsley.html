@@ -75,6 +75,8 @@
 <div class="container">
     <h1 class="text-center mb-4">Alle HTML5 Input-Typen mit Parsley.js</h1>
 
+    <div id="form-message" class="alert mb-3" style="display: none;"></div>
+
     <form id="demo-form" data-parsley-validate class="bg-white p-4 rounded shadow-sm">
 
         <div class="form-section">
@@ -116,16 +118,16 @@
 
             <!-- url -->
             <div class="mb-3">
-                <label for="website" class="form-label">Webseite</label>
-                <input type="url" id="website" class="form-control" name="website"
+                <label for="website" class="form-label required">Webseite</label>
+                <input type="url" id="website" class="form-control" name="website" required
                        data-parsley-type="url"
                        data-parsley-type-message="Bitte geben Sie eine gültige URL ein (z.B. https://example.com)">
             </div>
 
             <!-- tel -->
             <div class="mb-3">
-                <label for="phone" class="form-label">Telefon</label>
-                <input type="tel" id="phone" class="form-control" name="phone"
+                <label for="phone" class="form-label required">Telefon</label>
+                <input type="tel" id="phone" class="form-control" name="phone" required
                        data-parsley-pattern="^[\+]?[0-9\s\-\(\)]{6,}$"
                        data-parsley-pattern-message="Gültige Telefonnummer mit mindestens 6 Ziffern erforderlich">
                 <div class="form-text">Gültige Telefonnummer mit mindestens 6 Ziffern</div>
@@ -133,8 +135,8 @@
 
             <!-- search -->
             <div class="mb-3">
-                <label for="search" class="form-label">Suche</label>
-                <input type="search" id="search" class="form-control" name="search"
+                <label for="search" class="form-label required">Suche</label>
+                <input type="search" id="search" class="form-control" name="search" required
                        data-parsley-maxlength="100"
                        data-parsley-maxlength-message="Maximal 100 Zeichen erlaubt">
             </div>
@@ -157,9 +159,9 @@
 
             <!-- range -->
             <div class="mb-3">
-                <label for="volume" class="form-label">Lautstärke (0-100): <span id="volume-value" class="volume-display">50</span></label>
+                <label for="volume" class="form-label required">Lautstärke (0-100): <span id="volume-value" class="volume-display">50</span></label>
                 <input type="range" id="volume" class="form-range" name="volume"
-                       min="0" max="100" value="50"
+                       min="0" max="100" value="50" required
                        data-parsley-range="[0, 100]"
                        data-parsley-range-message="Wert muss zwischen 0 und 100 liegen">
             </div>
@@ -170,8 +172,8 @@
 
             <!-- date -->
             <div class="mb-3">
-                <label for="birthday" class="form-label">Geburtstag</label>
-                <input type="date" id="birthday" class="form-control" name="birthday"
+                <label for="birthday" class="form-label required">Geburtstag</label>
+                <input type="date" id="birthday" class="form-control" name="birthday" required
                        data-parsley-max=""
                        data-parsley-max-message="Das Datum darf nicht in der Zukunft liegen">
                 <div class="form-text">Darf nicht in der Zukunft liegen</div>
@@ -179,36 +181,35 @@
 
             <!-- datetime-local -->
             <div class="mb-3">
-                <label for="appointment" class="form-label">Termin</label>
-                <input type="datetime-local" id="appointment" class="form-control" name="appointment"
-                       data-parsley-min=""
-                       data-parsley-min-message="Das Datum muss in der Zukunft liegen">
+                <label for="appointment" class="form-label required">Termin</label>
+                <input type="datetime-local" id="appointment" class="form-control" name="appointment" required
+                       data-parsley-futuredatetime="true"
+                       data-parsley-futuredatetime-message="Das Datum muss in der Zukunft liegen">
                 <div class="form-text">Muss in der Zukunft liegen</div>
             </div>
 
             <!-- month -->
             <div class="mb-3">
-                <label for="month" class="form-label">Monat (YYYY-MM)</label>
-                <input type="month" id="month" name="month" class="form-control"
+                <label for="month" class="form-label required">Monat (YYYY-MM)</label>
+                <input type="month" id="month" name="month" class="form-control mb-2" required
                        data-parsley-pattern="^\d{4}-(0[1-9]|1[0-2])$"
                        data-parsley-pattern-message="Bitte geben Sie einen gültigen Monat ein (YYYY-MM)">
+                <input type="date" id="month-calendar" class="form-control calendar-helper"
+                       aria-label="Kalender für Monatsauswahl" data-parsley-excluded="true">
+                <div class="form-text">Kalenderauswahl überträgt das Jahr und den Monat in das Feld.</div>
             </div>
 
             <!-- week -->
             <div class="mb-3">
-                <label for="week" class="form-label">Woche (YYYY-Www)</label>
-                <input type="week" id="week" name="week" class="form-control"
+                <label for="week" class="form-label required">Woche (YYYY-Www)</label>
+                <input type="week" id="week" name="week" class="form-control mb-2" required
                        data-parsley-pattern="^\d{4}-W(0[1-9]|[1-4][0-9]|5[0-3])$"
                        data-parsley-pattern-message="Bitte geben Sie eine gültige Woche ein (YYYY-Www)">
+                <input type="date" id="week-calendar" class="form-control calendar-helper"
+                       aria-label="Kalender für Wochenauswahl" data-parsley-excluded="true">
+                <div class="form-text">Kalendereingabe bestimmt die ISO-Woche.</div>
             </div>
 
-            <!-- time -->
-            <div class="mb-3">
-                <label for="alarm" class="form-label">Weckzeit</label>
-                <input type="time" id="alarm" class="form-control" name="alarm"
-                       data-parsley-type="time"
-                       data-parsley-type-message="Bitte geben Sie eine gültige Zeit ein">
-            </div>
         </div>
 
         <div class="form-section">
@@ -216,19 +217,20 @@
 
             <!-- color -->
             <div class="mb-3">
-                <label for="favcolor" class="form-label">Lieblingsfarbe</label><br>
-                <input type="color" id="favcolor" class="form-control form-control-color" name="favcolor" value="#563d7c">
+                <label for="favcolor" class="form-label required">Lieblingsfarbe</label><br>
+                <input type="color" id="favcolor" class="form-control form-control-color" name="favcolor" value="#563d7c" required>
                 <div class="color-preview" id="color-preview" style="background-color: #563d7c;"></div>
                 <div class="form-text">Ausgewählte Farbe: <span id="color-value">#563d7c</span></div>
             </div>
 
             <!-- file -->
             <div class="mb-3">
-                <label for="fileUpload" class="form-label">Datei hochladen</label>
-                <input type="file" id="fileUpload" class="form-control" name="fileUpload"
-                       accept="image/png,image/jpeg,.png,.jpg,.jpeg" 
+                <label for="fileUpload" class="form-label required">Datei hochladen</label>
+                <input type="file" id="fileUpload" class="form-control" name="fileUpload" required
+                       accept="image/png,image/jpeg" 
                        data-parsley-filemaxmegabytes="2"
-                       data-parsley-accept="png,jpg">
+                       data-parsley-accept="png,jpg"
+                       data-parsley-fileextensions="jpg,jpeg,png">
                 <div class="file-preview" id="file-preview"></div>
                 <div class="file-info" id="file-info"></div>
                 <div class="form-text">Erlaubte Dateitypen: PNG, JPG. Maximal 2 MB.</div>
@@ -288,26 +290,180 @@
         </div>
 
         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-            <input type="submit" class="btn btn-primary" value="Absenden">
+            <input type="submit" id="formSubmit" class="btn btn-primary" value="Absenden">
         </div>
     </form>
 </div>
 
 <script>
     $(function () {
+        const allowedImageMimeTypes = ['image/png', 'image/jpeg'];
+        const allowedImageExtensions = ['png', 'jpg', 'jpeg'];
+
+        function formatLocalDate(date) {
+            const tzOffset = date.getTimezoneOffset() * 60000;
+            return new Date(date.getTime() - tzOffset).toISOString().split('T')[0];
+        }
+
+        function formatLocalDateTime(date) {
+            const tzOffset = date.getTimezoneOffset() * 60000;
+            return new Date(date.getTime() - tzOffset).toISOString().slice(0, 16);
+        }
+
+        function isAllowedImageFile(file) {
+            if (!file) {
+                return false;
+            }
+            if (file.type && allowedImageMimeTypes.includes(file.type.toLowerCase())) {
+                return true;
+            }
+            const extension = file.name.split('.').pop().toLowerCase();
+            return allowedImageExtensions.includes(extension);
+        }
+
+        function getISOWeekString(dateString) {
+            if (!dateString) {
+                return '';
+            }
+            const date = new Date(dateString);
+            date.setHours(0, 0, 0, 0);
+            // ISO week: Thursday determines week number
+            const dayNum = (date.getDay() + 6) % 7;
+            date.setDate(date.getDate() + 3 - dayNum);
+            const firstThursday = new Date(date.getFullYear(), 0, 4);
+            const weekNumber = Math.round(((date.getTime() - firstThursday.getTime()) / 86400000 - 3 + ((firstThursday.getDay() + 6) % 7)) / 7) + 1;
+            const weekStr = weekNumber < 10 ? '0' + weekNumber : weekNumber;
+            return `${date.getFullYear()}-W${weekStr}`;
+        }
+
+        function setupCalendarSync(calendarSelector, targetSelector, transformFn) {
+            const calendar = document.querySelector(calendarSelector);
+            const target = document.querySelector(targetSelector);
+            if (!calendar || !target) {
+                return;
+            }
+            calendar.addEventListener('change', function () {
+                if (!calendar.value) {
+                    return;
+                }
+                const transformed = transformFn(calendar.value);
+                if (!transformed) {
+                    return;
+                }
+                target.value = transformed;
+                target.dispatchEvent(new Event('input', { bubbles: true }));
+                target.dispatchEvent(new Event('change', { bubbles: true }));
+            });
+        }
+
+        function updateDateConstraints() {
+            const now = new Date();
+            const maxDate = formatLocalDate(now);
+            $('#birthday').attr('max', maxDate).attr('data-parsley-max', maxDate);
+        }
+
+        // ============================================
+        // Custom Parsley Validatoren - MÜSSEN VOR der Initialisierung definiert werden
+        // ============================================
+
+        // Custom Validator für Dateiupload-Größe
+        window.Parsley.addValidator('filemaxmegabytes', {
+            validateString: function(_value, maxMegabytes, parsleyInstance) {
+                if (!window.FormData) {
+                    return true; // Fallback für ältere Browser
+                }
+                var files = parsleyInstance.$element[0].files;
+                if (files.length == 0) {
+                    return true; // Keine Datei ausgewählt
+                }
+                return files[0].size <= maxMegabytes * 1024 * 1024;
+            },
+            requirementType: 'integer',
+            messages: {
+                de: 'Die Datei darf maximal %s MB groß sein.'
+            }
+        });
+
+        // Custom Validator für Dateityp
+        window.Parsley.addValidator('accept', {
+            validateString: function(_value, acceptType, parsleyInstance) {
+                if (!window.FormData) {
+                    return true; // Fallback für ältere Browser
+                }
+                var files = parsleyInstance.$element[0].files;
+                if (files.length == 0) {
+                    return true; // Keine Datei ausgewählt
+                }
+
+                var file = files[0];
+                if (acceptType === 'png,jpg') {
+                    return isAllowedImageFile(file);
+                }
+
+                return true;
+            },
+            messages: {
+                de: 'Bitte wählen Sie eine PNG- oder JPG-Datei aus.'
+            }
+        });
+
+        // Custom Validator für Datei-Endungen
+        window.Parsley.addValidator('fileextensions', {
+            validateString: function(_value, extensions, parsleyInstance) {
+                if (!window.FormData) {
+                    return true;
+                }
+                const files = parsleyInstance.$element[0].files;
+                if (!files.length) {
+                    return true;
+                }
+                const file = files[0];
+                const allowed = extensions.split(',').map(function(ext) { return ext.trim().toLowerCase(); });
+                const fileExt = file.name.split('.').pop().toLowerCase();
+                return allowed.includes(fileExt);
+            },
+            requirementType: 'string',
+            messages: {
+                de: 'Nur Dateien mit den Endungen %s sind erlaubt.'
+            }
+        });
+
+        // Custom Validator für Termin in der Zukunft
+        window.Parsley.addValidator('futuredatetime', {
+            validateString: function(value) {
+                if (!value) {
+                    return true;
+                }
+                const date = new Date(value);
+                if (isNaN(date.getTime())) {
+                    return false;
+                }
+                return date.getTime() > Date.now();
+            },
+            priority: 32,
+            messages: {
+                de: 'Bitte wählen Sie einen Termin in der Zukunft.'
+            }
+        });
+
         // Parsley.js deutsche Lokalisierung aktivieren
         window.Parsley.setLocale('de');
         
         // Dynamische Datumswerte setzen
-        const today = new Date();
-        const todayStr = today.toISOString().split('T')[0]; // YYYY-MM-DD
-        const nowStr = today.toISOString().slice(0, 16); // YYYY-MM-DDTHH:mm
+        updateDateConstraints();
+        setInterval(updateDateConstraints, 60 * 1000);
+
+        setupCalendarSync('#month-calendar', '#month', function (value) {
+            return value ? value.slice(0, 7) : '';
+        });
+        setupCalendarSync('#week-calendar', '#week', function (value) {
+            return getISOWeekString(value);
+        });
+        $('#appointment, #birthday').on('focus', updateDateConstraints);
         
-        $('#birthday').attr('data-parsley-max', todayStr);
-        $('#appointment').attr('data-parsley-min', nowStr);
-        
-        // Parsley.js Konfiguration
-        $('#demo-form').parsley({
+        // Parsley.js Konfiguration - NACH den Custom Validatoren
+        const $form = $('#demo-form');
+        const parsleyForm = $form.parsley({
             trigger: 'change',
             triggerAfterFailure: 'input',
             errorClass: 'is-invalid',
@@ -316,17 +472,48 @@
             errorTemplate: '<li class="parsley-required"></li>'
         });
 
-        $('#demo-form').on('submit', function(e) {
-            e.preventDefault();
-        });
+        // Funktion zum Anzeigen von Meldungen
+        function showFormMessage(message, type) {
+            const $message = $('#form-message');
+            $message.removeClass('alert-success alert-danger');
+            $message.addClass(type === 'success' ? 'alert-success' : 'alert-danger');
+            $message.text(message);
+            $message.fadeIn();
+            
+            // Zum Anfang der Seite scrollen, damit die Meldung sichtbar ist
+            $('html, body').animate({ scrollTop: 0 }, 300);
+            
+            // Nach 5 Sekunden ausblenden
+            setTimeout(function() {
+                $message.fadeOut();
+            }, 5000);
+        }
 
-        $('input[type="submit"]').on('click', function(e) {
-            e.preventDefault();
-            if ($('#demo-form').parsley().isValid()) {
-                alert('Formular erfolgreich validiert! In einer echten Anwendung würde es jetzt abgeschickt werden.');
-            } else {
-                alert('Bitte korrigieren Sie die Fehler im Formular.');
+        // Flag um zu unterscheiden ob Reset programmatisch oder durch Button erfolgt
+        let isProgrammaticReset = false;
+
+        // ==== Submit Handler ====
+        $form.on('submit', function(e) {
+            e.preventDefault(); // verhindert echtes Submit
+
+            parsleyForm.validate({ force: true });
+
+            if (!parsleyForm.isValid({ force: true })) {
+                showFormMessage('Bitte korrigieren Sie die Fehler im Formular.', 'error');
+                return; // ⛔ STOP - nicht absenden
             }
+
+            // Formular ist gültig – jetzt absenden
+            rotateSubmitImage();
+            showFormMessage('Formular erfolgreich validiert!', 'success');
+            
+            // Programmatisches Reset - Flag setzen
+            isProgrammaticReset = true;
+            $form[0].reset();
+            parsleyForm.reset();
+            updateHiddenToken();
+            updateDateConstraints();
+            isProgrammaticReset = false;
         });
 
         // ============================================
@@ -346,7 +533,8 @@
         });
 
         // 3. FILE: Dateivorschau, Größenprüfung, Drag & Drop
-        $('#fileUpload').on('change', function(e) {
+        const $fileUpload = $('#fileUpload');
+        $fileUpload.on('change', function(e) {
             const file = e.target.files[0];
             const preview = $('#file-preview');
             const info = $('#file-info');
@@ -355,15 +543,22 @@
             info.empty();
             
             if (file) {
+                if (!isAllowedImageFile(file)) {
+                    info.html('<span class="text-danger">Nur PNG- oder JPG-Dateien sind erlaubt.</span>');
+                    $(this).val('');
+                    $(this).parsley().validate();
+                    return;
+                }
+
                 // Größenprüfung (in MB)
                 const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
-                info.html(`Dateiname: ${file.name}<br>Größe: ${fileSizeMB} MB<br>Typ: ${file.type}`);
+                info.html(`Dateiname: ${file.name}<br>Größe: ${fileSizeMB} MB<br>Typ: ${file.type || 'unbekannt'}`);
                 
                 // Dateivorschau für Bilder
-                if (file.type.startsWith('image/')) {
+                if ((file.type && file.type.startsWith('image/')) || isAllowedImageFile(file)) {
                     const reader = new FileReader();
-                    reader.onload = function(e) {
-                        preview.html(`<img src="${e.target.result}" alt="Vorschau">`);
+                    reader.onload = function(ev) {
+                        preview.html(`<img src="${ev.target.result}" alt="Vorschau">`);
                     };
                     reader.readAsDataURL(file);
                 }
@@ -372,6 +567,10 @@
 
         // RESET: Farbe und Bild zurücksetzen
         $('#demo-form').on('reset', function() {
+            // Nur Meldung anzeigen wenn Reset durch Button erfolgt (nicht programmatisch)
+            if (!isProgrammaticReset) {
+                showFormMessage('Formular wurde zurückgesetzt.', 'success');
+            }
             setTimeout(function() {
                 // Farbe zurücksetzen
                 $('#favcolor').val('#563d7c');
@@ -387,7 +586,7 @@
 
         // Drag & Drop für File-Input
         const fileInput = $('#fileUpload')[0];
-        const fileContainer = fileInput.closest('.mb-3');
+        const fileContainer = $('#fileUpload').closest('.mb-3');
         
         fileContainer.on('dragover', function(e) {
             e.preventDefault();
@@ -423,12 +622,10 @@
             'https://placehold.co/600x400/dc3545/ffffff?text=Send'
         ];
         
-        $('#imageSubmit').on('click', function(e) {
-            e.preventDefault();
+        function rotateSubmitImage() {
             imageIndex = (imageIndex + 1) % images.length;
-            $(this).attr('src', images[imageIndex]);
-            alert('Bild wurde geändert! Bild ' + (imageIndex + 1) + ' von ' + images.length);
-        });
+            $('#imageSubmit').attr('src', images[imageIndex]);
+        }
 
         // 6. HIDDEN: Dynamisches Setzen von Werten
         function updateHiddenToken() {
@@ -443,66 +640,6 @@
         // Token bei jedem Feld-Change aktualisieren
         $('#demo-form').on('change', 'input, select, textarea', function() {
             updateHiddenToken();
-        });
-
-        // ============================================
-        // Custom Parsley Validatoren
-        // ============================================
-
-        // Custom Validator für Dateiupload-Größe
-        window.Parsley.addValidator('filemaxmegabytes', {
-            validateString: function(_value, maxMegabytes, parsleyInstance) {
-                if (!window.FormData) {
-                    return true; // Fallback für ältere Browser
-                }
-                var files = parsleyInstance.$element[0].files;
-                if (files.length == 0) {
-                    return true; // Keine Datei ausgewählt
-                }
-                return files[0].size <= maxMegabytes * 1024 * 1024;
-            },
-            requirementType: 'integer',
-            messages: {
-                de: 'Die Datei darf maximal %s MB groß sein.'
-            }
-        });
-
-        // Custom Validator für Dateityp
-        window.Parsley.addValidator('accept', {
-            validateString: function(_value, acceptType, parsleyInstance) {
-                if (!window.FormData) {
-                    return true; // Fallback für ältere Browser
-                }
-                var files = parsleyInstance.$element[0].files;
-                if (files.length == 0) {
-                    return true; // Keine Datei ausgewählt
-                }
-
-                var file = files[0];
-                if (acceptType === 'png,jpg') {
-                    return file.type === 'image/png' || file.type === 'image/jpeg';
-                }
-
-                return true;
-            },
-            messages: {
-                de: 'Bitte wählen Sie eine PNG- oder JPG-Datei aus.'
-            }
-        });
-
-        // Custom Validator für Range-Wert
-        window.Parsley.addValidator('range', {
-            validateString: function(value, requirement, parsleyInstance) {
-                const range = requirement.replace(/[\[\]]/g, '').split(',');
-                const min = parseFloat(range[0]);
-                const max = parseFloat(range[1]);
-                const numValue = parseFloat(value);
-                return numValue >= min && numValue <= max;
-            },
-            requirementType: 'string',
-            messages: {
-                de: 'Der Wert muss zwischen %s liegen.'
-            }
         });
     });
 </script>

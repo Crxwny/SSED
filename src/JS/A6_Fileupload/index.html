@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Datei-Upload mit Sicherheitsmaßnahmen</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/parsleyjs@2.9.2/dist/parsley.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/parsleyjs@2.9.2/dist/i18n/de.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .upload-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            padding: 30px;
+        }
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .upload-area:hover {
+            background: #e9ecef;
+            border-color: #764ba2;
+        }
+        .upload-area.dragover {
+            background: #d4edda;
+            border-color: #28a745;
+        }
+        .file-preview {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            display: none;
+        }
+        .file-preview img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        .file-info {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        .progress {
+            height: 25px;
+            margin-top: 15px;
+            display: none;
+        }
+        .alert {
+            margin-top: 20px;
+            display: none;
+        }
+        .security-info {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+        }
+        .security-info h5 {
+            color: #1976D2;
+            margin-bottom: 10px;
+        }
+        .security-info ul {
+            margin-bottom: 0;
+        }
+        .parsley-errors-list {
+            margin-top: 0.25rem;
+            margin-bottom: 0;
+            padding-left: 0;
+            list-style: none;
+        }
+        .parsley-errors-list li {
+            color: #dc3545;
+            font-size: 0.875rem;
+        }
+        .parsley-error {
+            border-color: #dc3545 !important;
+        }
+        .parsley-success {
+            border-color: #198754 !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="upload-container">
+        <h1 class="text-center mb-4">Sicherer Datei-Upload</h1>
+        
+        <form id="uploadForm" data-parsley-validate>
+            <div class="upload-area" id="uploadArea">
+                <i class="bi bi-cloud-upload" style="font-size: 3rem; color: #667eea;">📁</i>
+                <h4 class="mt-3">Datei hier ablegen oder klicken zum Auswählen</h4>
+                <p class="text-muted">Erlaubte Dateitypen: JPG, PNG, GIF, PDF, TXT<br>
+                Maximale Dateigröße: 5 MB</p>
+                <input 
+                    type="file" 
+                    id="fileInput" 
+                    name="file" 
+                    class="d-none"
+                    required
+                    accept=".jpg,.jpeg,.png,.gif,.pdf,.txt,image/jpeg,image/png,image/gif,application/pdf,text/plain"
+                    data-parsley-filemaxmegabytes="5"
+                    data-parsley-accept="jpg,jpeg,png,gif,pdf,txt"
+                    data-parsley-required-message="Bitte wählen Sie eine Datei aus"
+                >
+            </div>
+            
+            <div class="file-preview" id="filePreview">
+                <h5>Dateivorschau:</h5>
+                <div id="previewContent"></div>
+                <div class="file-info" id="fileInfo"></div>
+            </div>
+            
+            <div class="progress" id="progressBar">
+                <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                     role="progressbar" 
+                     style="width: 0%"
+                     id="progressBarFill">
+                    0%
+                </div>
+            </div>
+            
+            <div class="alert" id="alertMessage" role="alert"></div>
+            
+            <div class="d-grid gap-2 mt-4">
+                <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                    Datei hochladen
+                </button>
+                <button type="button" class="btn btn-secondary" id="resetBtn">
+                    Zurücksetzen
+                </button>
+            </div>
+        </form>
+        
+        <div class="security-info">
+            <h5>🔒 Implementierte Sicherheitsmaßnahmen:</h5>
+            <ul>
+                <li><strong>Client-seitig:</strong> Dateityp-Validierung, Größenprüfung, Parsley.js Validierung</li>
+                <li><strong>Server-seitig:</strong> MIME-Type Prüfung, Dateigrößen-Limit, Path Traversal Schutz</li>
+                <li><strong>Zusätzlich:</strong> Rate Limiting, Dateinamen-Sanitization, Sichere Dateispeicherung</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        $(function () {
+            // Parsley.js deutsche Lokalisierung
+            window.Parsley.setLocale('de');
+            
+            const fileInput = $('#fileInput');
+            const uploadArea = $('#uploadArea');
+            const filePreview = $('#filePreview');
+            const previewContent = $('#previewContent');
+            const fileInfo = $('#fileInfo');
+            const progressBar = $('#progressBar');
+            const progressBarFill = $('#progressBarFill');
+            const alertMessage = $('#alertMessage');
+            const uploadForm = $('#uploadForm');
+            const submitBtn = $('#submitBtn');
+            const resetBtn = $('#resetBtn');
+
+            // ============================================
+            // CLIENT-SEITIGE SICHERHEITSVALIDIERUNG
+            // ============================================
+
+            // Erlaubte Dateitypen
+            const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'application/pdf', 'text/plain'];
+            const ALLOWED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.pdf', '.txt'];
+            const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+
+            /**
+             * Prüft ob der Dateityp erlaubt ist
+             */
+            function validateFileType(file) {
+                const extension = '.' + file.name.split('.').pop().toLowerCase();
+                return ALLOWED_TYPES.includes(file.type) && ALLOWED_EXTENSIONS.includes(extension);
+            }
+
+            /**
+             * Prüft die Dateigröße
+             */
+            function validateFileSize(file) {
+                return file.size <= MAX_FILE_SIZE;
+            }
+
+            /**
+             * Zeigt Fehlermeldung an
+             */
+            function showAlert(message, type = 'danger') {
+                alertMessage.removeClass('alert-success alert-danger alert-warning')
+                           .addClass('alert-' + type)
+                           .text(message)
+                           .fadeIn();
+                setTimeout(() => alertMessage.fadeOut(), 5000);
+            }
+
+            /**
+             * Zeigt Erfolgsmeldung an
+             */
+            function showSuccess(message) {
+                showAlert(message, 'success');
+            }
+
+            /**
+             * Aktualisiert die Dateivorschau
+             */
+            function updatePreview(file) {
+                if (!file) {
+                    filePreview.hide();
+                    return;
+                }
+
+                // Validierung
+                if (!validateFileType(file)) {
+                    showAlert('Dateityp nicht erlaubt. Erlaubte Typen: JPG, PNG, GIF, PDF, TXT');
+                    fileInput.val('');
+                    filePreview.hide();
+                    return;
+                }
+
+                if (!validateFileSize(file)) {
+                    showAlert('Datei zu groß. Maximale Größe: 5 MB');
+                    fileInput.val('');
+                    filePreview.hide();
+                    return;
+                }
+
+                // Dateiinfo anzeigen
+                const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+                fileInfo.html(`
+                    <strong>Dateiname:</strong> ${escapeHtml(file.name)}<br>
+                    <strong>Größe:</strong> ${fileSizeMB} MB<br>
+                    <strong>Typ:</strong> ${file.type || 'Unbekannt'}
+                `);
+
+                // Vorschau für Bilder
+                previewContent.empty();
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        previewContent.html(`<img src="${e.target.result}" alt="Vorschau" class="img-fluid">`);
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    previewContent.html(`<i style="font-size: 4rem;">📄</i><p>${file.type || 'Datei'}</p>`);
+                }
+
+                filePreview.show();
+            }
+
+            /**
+             * HTML-Escape für Sicherheit
+             */
+            function escapeHtml(text) {
+                const map = {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#039;'
+                };
+                return text.replace(/[&<>"']/g, m => map[m]);
+            }
+
+            // ============================================
+            // EVENT HANDLER
+            // ============================================
+
+            // Klick auf Upload-Bereich - funktioniert überall im Bereich
+            uploadArea.on('click', function(e) {
+                // Verhindere nur wenn direkt auf den fileInput geklickt wurde
+                if (e.target === fileInput[0]) {
+                    return;
+                }
+                // Ansonsten öffne den Datei-Explorer
+                e.preventDefault();
+                e.stopPropagation();
+                fileInput[0].click();
+            });
+
+            // Datei ausgewählt
+            fileInput.on('change', function(e) {
+                const file = e.target.files[0];
+                updatePreview(file);
+            });
+
+            // Drag & Drop
+            uploadArea.on('dragover', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                $(this).addClass('dragover');
+            });
+
+            uploadArea.on('dragleave', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                $(this).removeClass('dragover');
+            });
+
+            uploadArea.on('drop', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                $(this).removeClass('dragover');
+                
+                const files = e.originalEvent.dataTransfer.files;
+                if (files.length > 0) {
+                    const file = files[0];
+                    fileInput[0].files = files;
+                    updatePreview(file);
+                }
+            });
+
+            // Formular absenden
+            uploadForm.on('submit', function(e) {
+                e.preventDefault();
+                
+                // Parsley Validierung
+                if (!uploadForm.parsley().isValid()) {
+                    showAlert('Bitte korrigieren Sie die Fehler im Formular.');
+                    return;
+                }
+
+                const file = fileInput[0].files[0];
+                if (!file) {
+                    showAlert('Bitte wählen Sie eine Datei aus.');
+                    return;
+                }
+
+                // Zusätzliche Client-seitige Validierung
+                if (!validateFileType(file)) {
+                    showAlert('Dateityp nicht erlaubt.');
+                    return;
+                }
+
+                if (!validateFileSize(file)) {
+                    showAlert('Datei zu groß. Maximale Größe: 5 MB');
+                    return;
+                }
+
+                // Upload durchführen
+                uploadFile(file);
+            });
+
+            /**
+             * Lädt die Datei zum Server hoch
+             */
+            function uploadFile(file) {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                // UI aktualisieren
+                submitBtn.prop('disabled', true).text('Wird hochgeladen...');
+                progressBar.show();
+                progressBarFill.css('width', '0%').text('0%');
+                alertMessage.hide();
+
+                // XMLHttpRequest für Upload mit Progress
+                const xhr = new XMLHttpRequest();
+
+                // Progress Event
+                xhr.upload.addEventListener('progress', function(e) {
+                    if (e.lengthComputable) {
+                        const percentComplete = (e.loaded / e.total) * 100;
+                        progressBarFill.css('width', percentComplete + '%')
+                                      .text(Math.round(percentComplete) + '%');
+                    }
+                });
+
+                // Erfolg
+                xhr.addEventListener('load', function() {
+                    submitBtn.prop('disabled', false).text('Datei hochladen');
+                    
+                    // Prüfe Content-Type
+                    const contentType = xhr.getResponseHeader('Content-Type') || '';
+                    const isJson = contentType.includes('application/json');
+                    
+                    if (xhr.status === 200) {
+                        try {
+                            const response = isJson ? JSON.parse(xhr.responseText) : { success: false, error: 'Ungültige Server-Antwort' };
+                            if (response.success) {
+                                showSuccess('Datei erfolgreich hochgeladen!');
+                                progressBarFill.css('width', '100%').text('100%');
+                                setTimeout(() => {
+                                    resetForm();
+                                }, 2000);
+                            } else {
+                                showAlert(response.error || 'Fehler beim Hochladen');
+                                progressBar.hide();
+                            }
+                        } catch (e) {
+                            console.error('Parse Error:', e, 'Response:', xhr.responseText);
+                            showAlert('Fehler beim Verarbeiten der Server-Antwort. Status: ' + xhr.status);
+                            progressBar.hide();
+                        }
+                    } else {
+                        try {
+                            const response = isJson && xhr.responseText ? JSON.parse(xhr.responseText) : { error: 'Unbekannter Fehler' };
+                            showAlert(response.error || 'Fehler beim Hochladen. Status: ' + xhr.status);
+                        } catch (e) {
+                            console.error('Error Response:', xhr.responseText);
+                            showAlert('Fehler beim Hochladen. Status: ' + xhr.status + (xhr.responseText ? ' - ' + xhr.responseText.substring(0, 100) : ''));
+                        }
+                        progressBar.hide();
+                    }
+                });
+
+                // Fehler
+                xhr.addEventListener('error', function() {
+                    showAlert('Netzwerkfehler beim Hochladen');
+                    progressBar.hide();
+                    submitBtn.prop('disabled', false).text('Datei hochladen');
+                });
+
+                // Abort
+                xhr.addEventListener('abort', function() {
+                    showAlert('Upload abgebrochen');
+                    progressBar.hide();
+                    submitBtn.prop('disabled', false).text('Datei hochladen');
+                });
+
+                // Request senden
+                xhr.open('POST', '/upload');
+                xhr.send(formData);
+            }
+
+            /**
+             * Setzt das Formular zurück
+             */
+            function resetForm() {
+                fileInput.val('');
+                filePreview.hide();
+                progressBar.hide();
+                progressBarFill.css('width', '0%').text('0%');
+                submitBtn.prop('disabled', false).text('Datei hochladen');
+                uploadForm.parsley().reset();
+            }
+
+            // Reset Button
+            resetBtn.on('click', function() {
+                resetForm();
+            });
+
+            // ============================================
+            // CUSTOM PARSLEY VALIDATOREN
+            // ============================================
+
+            // Custom Validator für Dateigröße
+            window.Parsley.addValidator('filemaxmegabytes', {
+                validateString: function(_value, maxMegabytes, parsleyInstance) {
+                    var files = parsleyInstance.$element[0].files;
+                    if (files.length == 0) {
+                        return true;
+                    }
+                    return files[0].size <= maxMegabytes * 1024 * 1024;
+                },
+                requirementType: 'integer',
+                messages: {
+                    de: 'Die Datei darf maximal %s MB groß sein.'
+                }
+            });
+
+            // Custom Validator für Dateityp
+            window.Parsley.addValidator('accept', {
+                validateString: function(_value, acceptTypes, parsleyInstance) {
+                    var files = parsleyInstance.$element[0].files;
+                    if (files.length == 0) {
+                        return true;
+                    }
+
+                    var file = files[0];
+                    var extension = '.' + file.name.split('.').pop().toLowerCase();
+                    var allowedTypes = acceptTypes.split(',').map(t => '.' + t.toLowerCase().trim());
+                    
+                    return allowedTypes.includes(extension) && 
+                           ALLOWED_TYPES.includes(file.type);
+                },
+                requirementType: 'string',
+                messages: {
+                    de: 'Bitte wählen Sie eine erlaubte Datei aus (JPG, PNG, GIF, PDF, TXT).'
+                }
+            });
+
+            // Parsley Konfiguration
+            uploadForm.parsley({
+                trigger: 'change',
+                triggerAfterFailure: 'input',
+                errorClass: 'is-invalid',
+                successClass: 'is-valid'
+            });
+        });
+    </script>
+</body>
+</html>
+
