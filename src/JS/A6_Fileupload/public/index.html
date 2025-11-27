@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Simple File Upload</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 2rem;
+        background-color: #f7f7f7;
+      }
+      main {
+        max-width: 400px;
+        margin: 0 auto;
+        padding: 1.5rem;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      label,
+      input,
+      button {
+        display: block;
+        width: 100%;
+        margin-bottom: 1rem;
+      }
+      button {
+        cursor: pointer;
+        border: none;
+        padding: 0.75rem;
+        background-color: #2563eb;
+        color: #fff;
+        border-radius: 4px;
+        font-size: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Datei hochladen</h1>
+      <form action="/upload" method="post" enctype="multipart/form-data">
+        <label for="file">Wähle eine Datei</label>
+        <input type="file" id="file" name="file" required />
+        <button type="submit">Hochladen</button>
+      </form>
+      <p>Erlaubte Typen: PNG, JPG, GIF, PDF (max. 5&nbsp;MB).</p>
+    </main>
+  </body>
+</html>
+
