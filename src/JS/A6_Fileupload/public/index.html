@@ -34,6 +34,22 @@
         border-radius: 4px;
         font-size: 1rem;
       }
+      #feedback {
+        margin-top: 1rem;
+        padding: 0.75rem;
+        border-radius: 4px;
+        background-color: #e0e7ff;
+        color: #1e1b4b;
+        display: none;
+      }
+      #feedback[data-state='success'] {
+        background-color: #dcfce7;
+        color: #166534;
+      }
+      #feedback[data-state='error'] {
+        background-color: #fee2e2;
+        color: #991b1b;
+      }
     </style>
   </head>
   <body>
@@ -45,7 +61,43 @@
         <button type="submit">Hochladen</button>
       </form>
       <p>Erlaubte Typen: PNG, JPG, GIF, PDF (max. 5&nbsp;MB).</p>
+      <p id="feedback" role="status" aria-live="polite"></p>
     </main>
+    <script>
+      const form = document.querySelector('form');
+      const feedback = document.getElementById('feedback');
+
+      const showFeedback = (message, state) => {
+        feedback.textContent = message;
+        feedback.dataset.state = state;
+        feedback.style.display = 'block';
+      };
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const formData = new FormData(form);
+        showFeedback('Datei wird hochgeladen …', 'info');
+
+        try {
+          const response = await fetch(form.action, {
+            method: 'POST',
+            body: formData,
+          });
+          const payload = await response.json();
+          if (!response.ok) {
+            throw new Error(payload.message || 'Unbekannter Fehler');
+          }
+          const sizeInKb = (payload.size / 1024).toFixed(1);
+          showFeedback(
+            `✅ ${payload.message}: ${payload.filename} (${sizeInKb} KB)`,
+            'success',
+          );
+          form.reset();
+        } catch (error) {
+          showFeedback(`❌ Upload fehlgeschlagen: ${error.message}`, 'error');
+        }
+      });
+    </script>
   </body>
 </html>
 

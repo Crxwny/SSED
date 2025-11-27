@@ -49,6 +49,16 @@ app.post('/upload', upload.single('file'), (req, res) => {
     res.status(400).json({ message: 'No file uploaded' });
     return;
   }
+  console.log(
+    'Upload erfolgreich:',
+    JSON.stringify({
+      originalName: req.file.originalname,
+      storedAs: req.file.filename,
+      size: req.file.size,
+      mimetype: req.file.mimetype,
+      ip: req.ip,
+    }),
+  );
   res.json({
     message: 'File uploaded successfully',
     filename: req.file.filename,
