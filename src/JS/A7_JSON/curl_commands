@@ -1,0 +1,3 @@
+curl -X POST http://localhost:3000/validate/ajv -H "Content-Type: application/json" -d "{\"vorname\":\"Max\",\"nachname\":\"Mustermann\",\"email\":\"max@example.com\"}"
+
+curl -X POST http://localhost:3000/validate/joi -H "Content-Type: application/json" -d "{\"vorname\":\"Max\",\"nachname\":\"Mustermann\",\"email\":\"max@example.com\"}"
